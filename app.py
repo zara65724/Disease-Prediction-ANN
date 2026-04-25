@@ -1,10 +1,12 @@
-
 import streamlit as st
 import numpy as np
 import pickle
+from tensorflow.keras.models import load_model
 
-# Load model and scaler
-model = pickle.load(open('model.pkl', 'rb'))
+# ✅ Load model using Keras (NOT pickle)
+model = load_model('ann_model.h5')
+
+# ✅ Load scaler with pickle
 scaler = pickle.load(open('scaler.pkl', 'rb'))
 
 st.set_page_config(page_title="Disease Prediction System", layout="centered")
