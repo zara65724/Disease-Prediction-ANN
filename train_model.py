@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 import pickle
@@ -14,11 +13,11 @@ df = pd.read_csv('disease_prediction_dataset.csv')
 df.fillna(df.mean(numeric_only=True), inplace=True)
 
 # Features & label
-X = df[['age','blood_pressure','cholesterol','heart_rate','symptom_score']]
+X = df[['age', 'blood_pressure', 'cholesterol', 'heart_rate', 'symptom_score']]
 y = df['disease_label']
 
 # Split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Scaling
 scaler = StandardScaler()
@@ -34,11 +33,12 @@ model.add(Dense(1, activation='sigmoid'))
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
 # Train
-model.fit(X_train, y_train, epochs=20, batch_size=16)
+model.fit(X_train, y_train, epochs=20, batch_size=16, validation_data=(X_test, y_test))
 
-# Save
+# ✅ Save model using Keras (NOT pickle)
 model.save("ann_model.h5")
-pickle.dump(model, open("model.pkl", "wb"))
+
+# ✅ Save only the scaler with pickle (this is fine)
 pickle.dump(scaler, open("scaler.pkl", "wb"))
 
 print("Model trained and saved!")
