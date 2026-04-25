@@ -3,8 +3,8 @@ import numpy as np
 import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import accuracy_score
 
 # Load dataset
 df = pd.read_csv('disease_prediction_dataset.csv')
@@ -22,23 +22,25 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 # Scaling
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
+X_test  = scaler.transform(X_test)
 
-# Build ANN
-model = Sequential()
-model.add(Dense(16, activation='relu', input_dim=X_train.shape[1]))
-model.add(Dense(8, activation='relu'))
-model.add(Dense(1, activation='sigmoid'))
+# Build ANN using sklearn (no TensorFlow needed!)
+model = MLPClassifier(
+    hidden_layer_sizes=(16, 8),
+    activation='relu',
+    solver='adam',
+    max_iter=200,
+    random_state=42
+)
 
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model.fit(X_train, y_train)
 
-# Train
-model.fit(X_train, y_train, epochs=20, batch_size=16, validation_data=(X_test, y_test))
+# Evaluate
+acc = accuracy_score(y_test, model.predict(X_test))
+print(f"Test Accuracy: {acc:.4f}")
 
-# ✅ Save model using Keras (NOT pickle)
-model.save("ann_model.h5")
-
-# ✅ Save only the scaler with pickle (this is fine)
+# Save both model and scaler
+pickle.dump(model,  open("model.pkl", "wb"))
 pickle.dump(scaler, open("scaler.pkl", "wb"))
 
-print("Model trained and saved!")
+print("Model and scaler saved!")
